@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GM Rewards - Minigames</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to GM Rewards - Minigames</h1>
+        
+        <div id="game">
+            <h3>Answer the Math Question</h3>
+            <p id="question"></p>
+            <input type="text" id="answer" placeholder="Your Answer">
+            <button onclick="submitAnswer()">Submit Answer</button>
+        </div>
+        
+        <p id="feedback"></p>
+        
+        <p>Points: <span id="points-display">0</span></p>
+        <button onclick="redeemPoints()">Redeem Points</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
