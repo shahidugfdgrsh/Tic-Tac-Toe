@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://www.example.com/background.jpg'); /* Add a background image URL */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+        }
+        .menu {
+            text-align: center;
+        }
+        .menu button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .menu button:hover {
+            background-color: #45a049;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cell.taken {
+            pointer-events: none;
+        }
+        .cell.x {
+            color: #ff5733;
+        }
+        .cell.o {
+            color: #33c9ff;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #fff;
+        }
+        .reset, .pause {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .reset:hover, .pause:hover {
+            background-color: #45a049;
+        }
+        .pause {
+            background-color: #f39c12;
+        }
+        .pause:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu">
+    <h1>Tic-Tac-Toe</h1>
+    <button onclick="startGame('1Player')">1 Player</button>
+    <button onclick="startGame('2Player')">Play with Friends</button>
+</div>
+
+<div id="gameContainer" style="display:none;">
+    <div id="board" class="board"></div>
+    <p class="message" id="message"></p>
+    <button class="reset" onclick="startGame(currentGameMode)">Reset Game</button>
+    <button class="pause" onclick="pauseGame()">Pause Game</button>
+</div>
+
+<script>
+    let currentGameMode = '';
+    let currentPlayer = 'X';
+    let board = [];
+    let gameOver = false;
+    let paused = false;
+    let aiDifficulty = 'easy'; // Default difficulty for AI
+
+    // Sounds
+    const moveSound = new Audio('https://www.example.com/move.mp3'); // Add move sound file URL
+    const winSound = new Audio('https://www.example.com/win.mp3'); // Add win sound file URL
+    const drawSound = new Audio('https://www.example.com/draw.mp3'); // Add draw sound file URL
+
+    function startGame(mode) {
+        currentGameMode = mode;
+        board = ['', '', '', '', '', '', '', '', ''];
+        gameOver = false;
+        paused = false;
+        currentPlayer = 'X';
+        document.getElementById('gameContainer').style.display = 'block';
+        document.querySelector('.menu').style.display = 'none';
+        renderBoard();
+        document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
+    }
+
+    function renderBoard() {
+        const boardElement = document.getElementById('board');
+        boardElement.innerHTML = '';
+        board.forEach((cell, index) => {
+            const cellElement = document.createElement('div');
+            cellElement.classList.add('cell');
+            cellElement.classList.add(cell ? cell.toLowerCase() : '');
+            if (cell) cellElement.classList.add('taken');
+            cellElement.innerText = cell;
+            cellElement.onclick = () => handleCellClick(index);
+            boardElement.appendChild(cellElement);
+        });
+    }
+
+    function handleCellClick(index) {
+        if (board[index] || gameOver || paused) return;
+        board[index] = currentPlayer;
+        playMoveSound();
+        renderBoard();
+        checkWinner();
+        if (!gameOver && currentGameMode === '1Player' && currentPlayer === 'X') {
+            setTimeout(aiMove, 500);
+        } else if (!gameOver) {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
+        }
+    }
+
+    function playMoveSound() {
+        moveSound.play();
+    }
+
+    function aiMove() {
+        if (gameOver || paused) return;
+        let emptyCells = [];
+        board.forEach((cell, index) => {
+            if (!cell) emptyCells.push(index);
+        });
+        const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+        // Implement AI difficulty logic
+        if (aiDifficulty === 'easy') {
+            board[randomCell] = 'O';
+        } else if (aiDifficulty === 'medium') {
+            board[randomCell] = 'O'; // Add medium AI logic here
+        } else if (aiDifficulty === 'hard') {
+            board[randomCell] = 'O'; // Add hard AI logic here
+        }
+
+        renderBoard();
+        checkWinner();
+        if (!gameOver) {
+            currentPlayer = 'X';
+            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
+        }
+    }
+
+    function checkWinner() {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertical
+            [0, 4, 8], [2, 4, 6] // diagonal
+        ];
+
+        for (let [a, b, c] of winningCombinations) {
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                gameOver = true;
+                winSound.play();
+                document.getElementById('message').innerText = `${board[a]} wins!`;
+                return;
+            }
+        }
+
+        if (board.every(cell => cell)) {
+            gameOver = true;
+            drawSound.play();
+            document.getElementById('message').innerText = "It's a draw!";
+        }
+    }
+
+    function pauseGame() {
+        paused = !paused;
+        if (paused) {
+            document.getElementById('message').innerText = "Game Paused. Click 'Pause' again to resume.";
+        } else {
+            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
+        }
+    }
+</script>
+
+</body>
+</html>
