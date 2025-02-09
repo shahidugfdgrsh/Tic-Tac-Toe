@@ -3,196 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #333;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .menu {
-            text-align: center;
-        }
-        .menu button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 32px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-        }
-        .menu button:hover {
-            background-color: #45a049;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-gap: 5px;
-            margin-top: 20px;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            background-color: rgba(255, 255, 255, 0.7);
-            border: 2px solid #333;
-            cursor: pointer;
-        }
-        .cell.taken {
-            pointer-events: none;
-        }
-        .cell.x {
-            color: #ff5733;
-        }
-        .cell.o {
-            color: #33c9ff;
-        }
-        .message {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 1.2em;
-        }
-        .reset, .pause {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .reset:hover, .pause:hover {
-            background-color: #45a049;
-        }
-        .pause {
-            background-color: #f39c12;
-        }
-        .pause:hover {
-            background-color: #e67e22;
-        }
-    </style>
+    <title>GM Rewards - Login / Sign Up</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>Welcome to GM Rewards</h1>
+        
+        <h2>Please Login or Sign Up for GM Rewards</h2>
 
-<div class="menu">
-    <h1>Tic-Tac-Toe</h1>
-    <button onclick="startGame('1Player')">1 Player</button>
-    <button onclick="startGame('2Player')">Play with Friends</button>
-</div>
+        <!-- Sign Up Form -->
+        <div id="sign-up-form">
+            <h3>Sign Up</h3>
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
 
-<div id="gameContainer" style="display:none;">
-    <div id="board" class="board"></div>
-    <p class="message" id="message"></p>
-    <button class="reset" onclick="startGame(currentGameMode)">Reset Game</button>
-    <button class="pause" onclick="pauseGame()">Pause Game</button>
-</div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
 
-<script>
-    let currentGameMode = '';
-    let currentPlayer = 'X';
-    let board = [];
-    let gameOver = false;
-    let paused = false;
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" required>
 
-    function startGame(mode) {
-        currentGameMode = mode;
-        board = ['', '', '', '', '', '', '', '', ''];
-        gameOver = false;
-        paused = false;
-        currentPlayer = 'X';
-        document.getElementById('gameContainer').style.display = 'block';
-        document.querySelector('.menu').style.display = 'none';
-        renderBoard();
-        document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
-    }
+            <button onclick="signUp()">Sign Up</button>
+        </div>
 
-    function renderBoard() {
-        const boardElement = document.getElementById('board');
-        boardElement.innerHTML = '';
-        board.forEach((cell, index) => {
-            const cellElement = document.createElement('div');
-            cellElement.classList.add('cell');
-            cellElement.classList.add(cell ? cell.toLowerCase() : '');
-            if (cell) cellElement.classList.add('taken');
-            cellElement.innerText = cell;
-            cellElement.onclick = () => handleCellClick(index);
-            boardElement.appendChild(cellElement);
-        });
-    }
+        <!-- Login Form -->
+        <div id="login-form" style="display: none;">
+            <h3>Login</h3>
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" required>
 
-    function handleCellClick(index) {
-        if (board[index] || gameOver || paused) return;
-        board[index] = currentPlayer;
-        renderBoard();
-        checkWinner();
-        if (!gameOver && currentGameMode === '1Player' && currentPlayer === 'X') {
-            setTimeout(aiMove, 500);
-        } else if (!gameOver) {
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
-        }
-    }
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" required>
 
-    function aiMove() {
-        if (gameOver || paused) return;
-        let emptyCells = [];
-        board.forEach((cell, index) => {
-            if (!cell) emptyCells.push(index);
-        });
-        const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        board[randomCell] = 'O';
-        renderBoard();
-        checkWinner();
-        if (!gameOver) {
-            currentPlayer = 'X';
-            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
-        }
-    }
+            <button onclick="login()">Login</button>
+        </div>
 
-    function checkWinner() {
-        const winningCombinations = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertical
-            [0, 4, 8], [2, 4, 6] // diagonal
-        ];
+        <!-- Redirect to Minigames -->
+        <div id="minigames" style="display: none;">
+            <p>Welcome, <span id="user-name"></span></p>
+            <button onclick="redirectToMinigames()">Start Earning Points</button>
+        </div>
+    </div>
 
-        for (let [a, b, c] of winningCombinations) {
-            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                gameOver = true;
-                document.getElementById('message').innerText = `${board[a]} wins!`;
-                return;
-            }
-        }
-
-        if (board.every(cell => cell)) {
-            gameOver = true;
-            document.getElementById('message').innerText = "It's a draw!";
-        }
-    }
-
-    function pauseGame() {
-        paused = !paused;
-        if (paused) {
-            document.getElementById('message').innerText = "Game Paused. Click 'Pause' again to resume.";
-        } else {
-            document.getElementById('message').innerText = `Player ${currentPlayer}'s turn`;
-        }
-    }
-</script>
-
+    <script src="app.js"></script>
 </body>
 </html>
