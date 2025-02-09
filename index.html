@@ -7,18 +7,17 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('https://www.example.com/background.jpg'); /* Add a background image URL */
-            background-size: cover;
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            color: #fff;
+            color: #333;
         }
         h1 {
             text-align: center;
-            color: #fff;
+            color: #333;
         }
         .menu {
             text-align: center;
@@ -52,7 +51,6 @@
             background-color: rgba(255, 255, 255, 0.7);
             border: 2px solid #333;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
         .cell.taken {
             pointer-events: none;
@@ -67,7 +65,6 @@
             margin-top: 20px;
             text-align: center;
             font-size: 1.2em;
-            color: #fff;
         }
         .reset, .pause {
             margin-top: 20px;
@@ -110,12 +107,6 @@
     let board = [];
     let gameOver = false;
     let paused = false;
-    let aiDifficulty = 'easy'; // Default difficulty for AI
-
-    // Sounds
-    const moveSound = new Audio('https://www.example.com/move.mp3'); // Add move sound file URL
-    const winSound = new Audio('https://www.example.com/win.mp3'); // Add win sound file URL
-    const drawSound = new Audio('https://www.example.com/draw.mp3'); // Add draw sound file URL
 
     function startGame(mode) {
         currentGameMode = mode;
@@ -146,7 +137,6 @@
     function handleCellClick(index) {
         if (board[index] || gameOver || paused) return;
         board[index] = currentPlayer;
-        playMoveSound();
         renderBoard();
         checkWinner();
         if (!gameOver && currentGameMode === '1Player' && currentPlayer === 'X') {
@@ -157,10 +147,6 @@
         }
     }
 
-    function playMoveSound() {
-        moveSound.play();
-    }
-
     function aiMove() {
         if (gameOver || paused) return;
         let emptyCells = [];
@@ -168,16 +154,7 @@
             if (!cell) emptyCells.push(index);
         });
         const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-
-        // Implement AI difficulty logic
-        if (aiDifficulty === 'easy') {
-            board[randomCell] = 'O';
-        } else if (aiDifficulty === 'medium') {
-            board[randomCell] = 'O'; // Add medium AI logic here
-        } else if (aiDifficulty === 'hard') {
-            board[randomCell] = 'O'; // Add hard AI logic here
-        }
-
+        board[randomCell] = 'O';
         renderBoard();
         checkWinner();
         if (!gameOver) {
@@ -196,7 +173,6 @@
         for (let [a, b, c] of winningCombinations) {
             if (board[a] && board[a] === board[b] && board[a] === board[c]) {
                 gameOver = true;
-                winSound.play();
                 document.getElementById('message').innerText = `${board[a]} wins!`;
                 return;
             }
@@ -204,7 +180,6 @@
 
         if (board.every(cell => cell)) {
             gameOver = true;
-            drawSound.play();
             document.getElementById('message').innerText = "It's a draw!";
         }
     }
